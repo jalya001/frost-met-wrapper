@@ -6,13 +6,12 @@ namespace frost_met_wrapper {
 // And with 64 byte segments, it probably wouldn't save any space anyways
 // Pretty sure an AoS is fine here?
 struct StationProps { // 64 bytes
-    char stationid[8];
-    char parameterid[4];
+    int stationid; // 4 bytes
     int elevation; // 4 bytes
     double latitude; // 8 bytes
     double longitude; // 8 bytes
-    char available_from[16];
-    char available_to[16];
+    char available_from[20];
+    char available_to[20];
 };
 
 }

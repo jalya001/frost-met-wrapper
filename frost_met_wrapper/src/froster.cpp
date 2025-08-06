@@ -14,13 +14,13 @@ void printStations(const StationProps* stations, size_t count) {
         const StationProps& s = stations[i];
 
         std::cout << "Station " << i + 1 << ":\n";
-        std::cout << "  Station ID:     " << std::string(s.stationid, 8) << "\n";
-        std::cout << "  Parameter ID:   " << std::string(s.parameterid, 4) << "\n";
+        std::cout << "  Station ID:     " << s.stationid << "\n";
+        //std::cout << "  Parameter ID:   " << std::string(s.parameterid, 4) << "\n";
         std::cout << "  Elevation:      " << s.elevation << "\n";
         std::cout << "  Latitude:       " << s.latitude << "\n";
         std::cout << "  Longitude:      " << s.longitude << "\n";
-        std::cout << "  Available From: " << std::string(s.available_from, 16) << "\n";
-        std::cout << "  Available To:   " << std::string(s.available_to, 16) << "\n";
+        std::cout << "  Available From: " << std::string(s.available_from, 20) << "\n";
+        std::cout << "  Available To:   " << std::string(s.available_to, 20) << "\n";
         std::cout << "-------------------------\n";
     }
 }

@@ -22,16 +22,15 @@ int count_headers(const char* json, size_t size) {
     return header_count;
 }
 
-constexpr std::array<KeyInfo, 9> keys{{
-    {"parameterid", 8, 4, STRINGZ, true},
-    {"stationid", 0, 8, STRINGZ, true},
+constexpr std::array<KeyInfo, 8> keys{{
+    {"stationid", 0, 4, STRINGZ, true},
     {"value", 0, 0, MILEPOST, true},
-    {"elevation(masl/hs)", 12, 4, INTEGERZ, true},
-    {"latitude", 16, 8, DECIMALZ, true},
-    {"longitude", 24, 8, DECIMALZ, true},
+    {"elevation(masl/hs)", 4, 4, INTEGERZ, true},
+    {"latitude", 8, 8, DECIMALZ, true},
+    {"longitude", 16, 8, DECIMALZ, true},
     {"available", 0, 0, MILEPOST, true},
-    {"from", 32, 16, DATEZ, true},
-    {"to", 48, 16, DATEZ, false}
+    {"from", 24, 20, STRINGZ, true},
+    {"to", 44, 20, STRINGZ, false}
 }};
 
 void extract_from_json(const char* json, int header_count, StationProps* tseries) {

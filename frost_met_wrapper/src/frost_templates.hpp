@@ -45,30 +45,21 @@ T froststring_to_num(const char*& p) {
 template <ExtractionMode Mode = STRINGZ>
 void extract_value(const char*& p, char* out, int out_len) {
     while (*p == ' ' || *p == '\n' || *p == '\t' || *p == '\r' || *p == '"') ++p;
-    if constexpr (Mode == DATEZ) {
-        for (int i = 0; i < out_len; ++p) { // Needs to skip .000 straight to the Z if there is a .
-            if (*p != '-' && *p != ':') {
-                out[i] = *p;
-                ++i;
-            }
+    const char* start = p;
+    while (*p && *p != '"' && *p != '\n') ++p;
+    --p;
+    const char* end = p;
+    int this_len = end - start;
+    if constexpr (Mode == STRINGZ) {
+        for (int i = 0; i < out_len; i++) {
+            out[i] = (i < this_len) ? start[i] : '\0';
         }
+    } else if (Mode == INTEGERZ) {
+        int value = froststring_to_num<int>(start);
+        *((int*) out) = value;
     } else {
-        const char* start = p;
-        while (*p && *p != '"' && *p != '\n') ++p;
-        --p;
-        const char* end = p;
-        int this_len = end - start;
-        if constexpr (Mode == STRINGZ) {
-            for (int i = 0; i < out_len; i++) {
-                out[i] = (i < this_len) ? start[i] : '\0';
-            }
-        } else if (Mode == INTEGERZ) {
-            int value = froststring_to_num<int>(start);
-            *((int*) out) = value;
-        } else {
-            double value = froststring_to_num<double>(start);
-            *((double*) out) = value;
-        }
+        double value = froststring_to_num<double>(start);
+        *((double*) out) = value;
     }
 }
 
@@ -92,12 +83,7 @@ bool find_key(const char*& p, const char* key, int len) {
 }
 
 template <const auto& Keys, std::size_t I = 0>
-void extract_all(const char*& p, char* data_as_bytes) {
-    static_assert(
-        std::is_same_v<std::remove_cvref_t<decltype(Keys)>,
-        std::array<KeyInfo, std::remove_cvref_t<decltype(Keys)>.size()>>,
-        "Keys must be a std::array<KeyInfo, N>, because idk how to template discrete N for that"
-    );
+void extract_all(const char*& p, char* data_as_bytes) { // Would be nice with a static assert
     if constexpr (I < Keys.size()) {
         constexpr auto& k = Keys[I];
         bool is_key;
