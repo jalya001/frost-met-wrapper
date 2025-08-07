@@ -19,7 +19,7 @@ constexpr std::size_t strlen_constexpr(const char* str) {
     return len;
 }
 
-#define STR_AND_LEN(str) str, strlen_constexpr(str)
+#define STR_AND_LEN(_str_input) _str_input, strlen_constexpr(_str_input)
 
 StationProps* parse_stations(const char* json_ptr, const size_t max_size, int* out_count);
 
@@ -32,6 +32,14 @@ struct KeyInfo {
     const ExtractionMode mode;
     const bool always_there;
 };
+
+#ifdef DEBUG
+    #define LOG(_data_input) do { std::cout << _data_input; } while(0)
+    #define LOGB(_data_ptr, _byte_len) do { std::cout.write((_data_ptr), (_byte_len)); } while(0)
+#else
+    #define LOG(_data_input) do {} while(0)
+    #define LOGB(_data_ptr, _byte_len) do {} while(0)
+#endif
 
 }
 }

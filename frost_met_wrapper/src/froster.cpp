@@ -37,8 +37,10 @@ int approximate(StationProps* input = nullptr) {
         size_t stations_bytes = http_get_response(stations_url, &stations_json_ptr);
         int stations_count;
         StationProps* tseries = parse_stations(stations_json_ptr, stations_bytes, &stations_count);
-    
+        
+        #ifdef DEBUG
         printStations(tseries, stations_count);
+        #endif
     }
     return 0;
 }

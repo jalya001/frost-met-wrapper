@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cmath>
 #include <array>
+#include <unordered_map>
 
 #include "frost_utils.hpp"
 
@@ -50,7 +51,7 @@ void extract_value(const char*& p, char* out, int out_len) {
     --p;
     const char* end = p;
     int this_len = end - start;
-    if constexpr (Mode == STRINGZ) {
+    if constexpr (Mode == STRINGZ || Mode == DATEZ) {
         for (int i = 0; i < out_len; i++) {
             out[i] = (i < this_len) ? start[i] : '\0';
         }
@@ -82,8 +83,8 @@ bool find_key(const char*& p, const char* key, int len) {
     return false;
 }
 
-template <const auto& Keys, std::size_t I = 0>
-void extract_all(const char*& p, char* data_as_bytes) { // Would be nice with a static assert
+template <const auto& Keys, std::size_t I = 0> // Would be nice with a static assert for right keys type
+void extract_all(const char*& p, char* data_as_bytes) { // Maybe this adds too much to the compiletime...
     if constexpr (I < Keys.size()) {
         constexpr auto& k = Keys[I];
         bool is_key;
@@ -96,31 +97,31 @@ void extract_all(const char*& p, char* data_as_bytes) { // Would be nice with a 
         if constexpr (k.mode != MILEPOST) {
             if (is_key) {
                 extract_value<k.mode>(p, data_as_bytes + k.index, k.len);
-                std::cout << k.key << " = ";
+                LOG(k.key << " = ");
                 if constexpr (k.mode == INTEGERZ) { 
-                    std::cout << *reinterpret_cast<const int*>(data_as_bytes + k.index);
+                    LOG(*reinterpret_cast<const int*>(data_as_bytes + k.index));
                 } else if (k.mode == DECIMALZ) {
-                    std::cout << *reinterpret_cast<const double*>(data_as_bytes + k.index);
+                    LOG(*reinterpret_cast<const double*>(data_as_bytes + k.index));
                 } else if (k.mode == DATEZ) {
-                    std::cout.write(data_as_bytes + k.index, k.len); // Temporary
+                    LOGB(data_as_bytes + k.index, k.len); // Temporary
                 } else {
-                    std::cout.write(data_as_bytes + k.index, k.len);
+                    LOGB(data_as_bytes + k.index, k.len);
                 }
-                std::cout << "\n";
+                LOG("\n");
             } else {
                 if constexpr (k.mode == DATEZ) {
-                    std::strcpy(data_as_bytes + k.index, "99990101T000000Z");
+                    std::strcpy(data_as_bytes + k.index, "9999-01-01T00:00:00Z");
                 } else {
                     for (int i = 0; i < k.len; ++i) {
                         *(data_as_bytes + k.index + i) = 0;
                     }
                 }
-                std::cout << k.key << " = ";
-                std::cout.write(data_as_bytes + k.index, k.len); // Temporary
-                std::cout << "\n";
+                LOG(k.key << " = ");
+                LOGB(data_as_bytes + k.index, k.len); // Temporary
+                LOG("\n");
             }
         } else {
-            std::cout << "Milepost: " << k.key << "\n";
+            LOG("Milepost: " << k.key << "\n");
         }
         extract_all<Keys, I + 1>(p, data_as_bytes);
     }
