@@ -14,7 +14,7 @@ namespace internal {
 
 template <typename T>
 T froststring_to_num(const char*& p) {
-    while (*p == ' ' || *p == '"') ++p;
+    while (*p == ' ' || *p == '"' || *p == ':') ++p;
     int sign = 1;
     if (*p == '+' || *p == '-') {
         if (*p == '-') sign = -1;
@@ -44,7 +44,7 @@ T froststring_to_num(const char*& p) {
 }
 
 template <ExtractionMode Mode = STRINGZ>
-void extract_value(const char*& p, char* out, int out_len) {
+void extract_value(const char*& p, char* out, int out_len) { // Should out be auto instead of char, but not supported in old c++ versions because fck you
     while (*p == ' ' || *p == '\n' || *p == '\t' || *p == '\r' || *p == '"') ++p;
     const char* start = p;
     while (*p && *p != '"' && *p != '\n') ++p;
