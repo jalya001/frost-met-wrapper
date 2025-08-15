@@ -21,7 +21,7 @@ constexpr std::size_t strlen_constexpr(const char* str) {
 
 #define STR_AND_LEN(_str_input) _str_input, strlen_constexpr(_str_input)
 
-StationProps* parse_stations(const char* json_ptr, const size_t max_size, int* out_count);
+int parse_stations(const char* json_ptr, const size_t max_size, int* out_count, std::unordered_map<int, StationProps*>& out_map, StationProps*& out_buffer);
 
 size_t http_get_response(const std::string& url, char** out_json_ptr);
 

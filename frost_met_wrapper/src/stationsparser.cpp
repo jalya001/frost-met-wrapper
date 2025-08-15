@@ -58,7 +58,7 @@ constexpr std::array<KeyInfo, 8> keys{{
     {"to", 44, 20, DATEZ, false}
 }};
 
-void extract_from_json(const char* json, int header_count, StationProps* tseries_buffer, std::unordered_map<int, StationProps*> tseries_map, std::bitset<MAX_STATIONID>& stationid_seen) {
+void extract_from_json(const char* json, int header_count, StationProps* tseries_buffer, std::unordered_map<int, StationProps*>& tseries_map, std::bitset<MAX_STATIONID>& stationid_seen) {
     LOG("There are " << header_count << " headers\n");
     const char* p = json;
     int station_counter = 0;
@@ -85,19 +85,16 @@ void extract_from_json(const char* json, int header_count, StationProps* tseries
     LOG("Finished parsing all headers.\n");
 }
 
-StationProps* parse_stations(const char* json_ptr, const size_t max_size, int* out_count) {
+int parse_stations(const char* json_ptr, const size_t max_size, int* out_count, std::unordered_map<int, StationProps*>& out_map, StationProps*& out_buffer) {
     std::bitset<MAX_STATIONID> stationid_seen;
     int header_count = 0;
-
     int station_count = count_unique_headers(json_ptr, max_size, &header_count, stationid_seen);
-    if (station_count == -1) return nullptr;
-    std::unordered_map<int, StationProps*> tseries_map;
-    // It's a rather big flaw not to use mph here, but no libs I found were suitable
-    tseries_map.reserve(station_count);
-    StationProps* tseries_buffer = (StationProps*) malloc(station_count * sizeof(StationProps));
-    extract_from_json(json_ptr, header_count, tseries_buffer, tseries_map, stationid_seen);
+    if (station_count == -1) return -1;
+    out_map.reserve(station_count);
+    out_buffer = static_cast<StationProps*>(malloc(station_count * sizeof(StationProps)));
+    extract_from_json(json_ptr, header_count, out_buffer, out_map, stationid_seen);
     *out_count = station_count;
-    return tseries_buffer;
+    return 1;
 }
 
 }

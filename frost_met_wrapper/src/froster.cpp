@@ -2,6 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include <iomanip>
+#include <unordered_map>
 
 #include "frost_utils.hpp"
 #include "frost_templates.hpp"
@@ -36,10 +37,17 @@ int approximate(StationProps* input = nullptr) {
         char* stations_json_ptr;
         size_t stations_bytes = http_get_response(stations_url, &stations_json_ptr);
         int stations_count;
-        StationProps* tseries = parse_stations(stations_json_ptr, stations_bytes, &stations_count);
+        std::unordered_map<int, StationProps*> tseries_map;
+        // It's a rather big flaw not to use mph here, but no libs I found were suitable
+        StationProps* tseries_buffer;
+        parse_stations(stations_json_ptr, stations_bytes, &stations_count, tseries_map, tseries_buffer);
         
         #ifdef DEBUG
-        printStations(tseries, stations_count);
+        printStations(tseries_buffer, stations_count);
+        LOG("Map\n");
+        for (const auto& pair : tseries_map) {
+            LOG(pair.first << " : " << pair.second << '\n');
+        }
         #endif
     }
     return 0;
